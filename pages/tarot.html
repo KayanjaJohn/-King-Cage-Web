@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zodiac Tarot Readings</title>
+    <link rel="stylesheet" href="/css/tarot.css">
+</head>
+<body>
+    <header>
+        <h1>
+            <b><span style="color: rgb(255, 186, 13)">Hor</span>osc<span style="color: rgb(255, 186, 13)">ope</span></b>
+        </h1>
+        <nav>
+            <ul>
+                <li class="nav-content"><a href="#" class="active">Home</a></li>
+                <li class="nav-content"><a href="index.html">Zodia Signs</a></li>
+                <li class="nav-content"><a href="angelNumb.html">Angel No</a></li>
+                <li class="nav-content"><a href="tarot.html">Tarot</a></li>
+            </ul>
+        </nav>
+        <div class="menu-icon" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+            <ul class="dropdown-menu">
+                <li><a href="#" class="active nav-content">Home</a></li>
+                <li class="nav-content"><a href="index.html">💫Zodia Signs💫</a></li>
+                <li class="nav-content"><a href="angelNumb.html">Angel Number</a></li>
+                <li class="nav-content"><a href="tarot.html">Tarot readings</a></li>
+                <li>
+                    <button id="theme-toggle" class="btn" style="margin: 3rem 3rem;">Theme</button>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <div class="container">
+        <h1 style="color: var(--text-color);">Zodiac Tarot Readings</h1>
+        <form">
+            <label for="zodiac-sign" style="float: left; font-size: 16px; font-weight: 700; color: var(--text-color);">Select your Zodiac Sign:</label><br>
+            <select id="zodiac-sign">
+                <option value="">Select your option</option>
+                <option value="Aries">Aries (March 21 - April 19)</option>
+                <option value="Taurus">Taurus (April 20 - May 20)</option>
+                <option value="Gemini">Gemini (May 21 - June 20)</option>
+                <option value="Cancer">Cancer (June 21 - July 22)</option>
+                <option value="Leo">Leo (July 23 - August 22)</option>
+                <option value="Virgo">Virgo (August 23 - September 22)</option>
+                <option value="Libra">Libra (September 23 - October 22)</option>
+                <option value="Scorpio">Scorpio (October 23 - November 21)</option>
+                <option value="Sagittarius">Sagittarius (November 22 - December 21)</option>
+                <option value="Capricorn">Capricorn (December 22 - January 19)</option>
+                <option value="Aquarius">Aquarius (January 20 - February 18)</option>
+                <option value="Pisces">Pisces (February 19 - March 20)</option>
+            </select>
+            <button id="get-reading-btn">Get Tarot Reading</button>
+            <button id="speak" class="btn">Speak</button>
+            <button id="stop" class="btn">Stop</button>
+        </form>
+        <div id="result-div"></div>
+    </div>
+
+    <footer>
+        <div id="footer">
+        <p class="label">
+            Developed by
+            <span
+                style="
+                    color: rgb(255, 186, 13);
+                    text-transform: uppercase;
+                    font-style: italic;
+                    font-weight: 800;
+                "
+                >Cage</span
+            >
+        </p>
+    </footer>
+
+    <script src="/js/tarot.js"></script>
+</body>
+</html>

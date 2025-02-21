@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Music Player</title>
+		<link rel="stylesheet" href="/css/music-player.css" />
+	</head>
+	<body>
+		<div class="container">
+			<h1>Music Player</h1>
+			<input type="file" id="folder-input" webkitdirectory="true" />
+
+			<div class="controls">
+				<button id="prev-btn">Previous</button>
+				<button id="play-btn">Play</button>
+				<button id="pause-btn">Pause</button>
+				<button id="stop-btn">Stop</button>
+				<button id="next-btn">Next</button>
+			</div>
+
+			<div class="song-info">
+				<h2 id="song-title"></h2>
+				<h3 id="song-artist"></h3>
+			</div>
+
+			<div class="progress-bar">
+				<progress id="progress-bar" value="0" max="100"></progress>
+			</div>
+		</div>
+		<script src="/js/music-player.js"></script>
+	</body>
+</html>
