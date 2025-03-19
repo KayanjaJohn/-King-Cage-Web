@@ -221,14 +221,12 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 	let newTheme;
   
 	if (currentTheme === 'light') {
-	  newTheme = 'dim';
-	} else if (currentTheme === 'dim') {
-	  newTheme = 'dark';
-	} else if (currentTheme === 'dark') {
-	  newTheme = 'grin';
-	} else {
-	  newTheme = 'light';
-	}
+		newTheme = 'dim';
+	  } else if (currentTheme === 'dim') {
+		newTheme = 'dark';
+	  } else {
+		newTheme = 'light';
+	  }
   
 	document.documentElement.setAttribute('data-theme', newTheme);
 	localStorage.setItem('theme', newTheme); // Save preference

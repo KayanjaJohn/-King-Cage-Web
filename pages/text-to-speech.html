@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text to Speech</title>
-    <link rel="stylesheet" href="/css/text-to-speech.css">
-</head>
-<body>
-    <h1>Text to speech</h1>
-    <textarea id="text" placeholder="Enter text here..."></textarea>
-    <button id="speak">Speak</button>
-    <button id="stop">Stop</button>
-    <script src="/js/text-to-speech.js"></script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Text to Speech</title>
+        <link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="/css/text-to-speech.css" />
+	</head>
+	<body>
+		<h1>Text to speech</h1>
+		<div class="container">
+			<div class="spofity-row" style="display: none;">
+            <canvas id="visualizer"></canvas>
+        </div>
+			<textarea
+				id="text"
+				placeholder="Enter text here..."></textarea>
+			<div class="btn">
+                <button id="speak"><i class="bx bx-play"></i></button>
+                <button id="stop"><i class="bx bx-stop"></i></button>
+            </div>
+		</div>
+
+		<script src="/js/text-to-speech.js"></script>
+	</body>
 </html>
