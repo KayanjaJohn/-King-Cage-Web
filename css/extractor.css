@@ -14,7 +14,7 @@ body {
 }
 
 #extracted-image {
-  width: 100%;
-  height: auto;
+  width: 320px;
+  height: 350px;
   margin-top: 20px;
 }
