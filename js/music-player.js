@@ -110,8 +110,8 @@ accessMediaButton.addEventListener('click', async () => {
       );
 
       displaySongList();
-    } else if (navigator.userAgent.match(/iPad|iPhone|iPod/i)) {
-      // Use a file input element with the webkitdirectory attribute for iOS devices
+    } else {
+      // Use a file input element with the webkitdirectory attribute for mobile devices
       const directoryInput = document.createElement('input');
       directoryInput.type = 'file';
       directoryInput.webkitdirectory = true;
@@ -123,43 +123,31 @@ accessMediaButton.addEventListener('click', async () => {
         const songs = Array.from(files).filter((file) =>
           file.name.endsWith('.mp3') ||
           file.name.endsWith('.wav') ||
-          file.name.endsWith('.ogg') ||
-          file.name.endsWith('.m4a')
+          file.name.endsWith('.ogg')
         );
         displaySongList();
       });
 
       directoryInput.click();
-    } else if (navigator.userAgent.match(/Android/i)) {
-      // Use the MediaDevices.getUserMedia API to access media files (for Android devices)
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then((stream) => {
-          // Process the audio stream
-          console.log(stream);
-        })
-        .catch((error) => {
-          console.error('Error accessing media files:', error);
-        });
     }
   } catch (error) {
     console.error('Error getting media files:', error);
   }
 });
 
-
-// Function to get files from a directory handle
 async function getFilesFromDirectoryHandle(directoryHandle) {
-	const files = [];
-	for await (const entry of directoryHandle.values()) {
-	  if (entry.kind === 'file') {
-		files.push({ name: entry.name, file: await entry.getFile() });
-	  } else if (entry.kind === 'directory') {
-		const subFiles = await getFilesFromDirectoryHandle(await entry.getDirectoryHandle());
-		files.push(...subFiles);
-	  }
-	}
-	return files;
+  const files = [];
+  for await (const entry of directoryHandle.values()) {
+    if (entry.kind === 'file') {
+      files.push({ name: entry.name, file: await entry.getFile() });
+    } else if (entry.kind === 'directory') {
+      const subFiles = await getFilesFromDirectoryHandle(await entry.getDirectoryHandle());
+      files.push(...subFiles);
+    }
   }
+  return files;
+}
+
 
 // Function to display the song list
 function displaySongList() {
