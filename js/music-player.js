@@ -151,7 +151,7 @@ async function getFilesFromDirectoryHandle(directoryHandle) {
 
 
 // Function to display the song list
-function displaySongList() {
+function displaySongList(songs) {
 	songList.innerHTML = "";
 	songs.forEach((song, index) => {
 		const songElement = document.createElement("li");
