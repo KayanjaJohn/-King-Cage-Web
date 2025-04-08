@@ -198,7 +198,7 @@ const femaleVoice = voices.filter(
 // Set the text and voice for the utterance
 utterance.text = resultDiv.textContent;
 utterance.voice = femaleVoice || voices[0];
-utterance.pitch = 1;
+utterance.pitch = 2;
 utterance.rate = 1.2;
 
 // Add event listeners to the buttons

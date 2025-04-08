@@ -22,7 +22,7 @@ const femaleVoice = voices.filter(
 // Set the text and voice for the utterance
 utterance.text = textArea.value;
 utterance.voice = femaleVoice || voices[0];
-utterance.pitch = 0.4;
+utterance.pitch = 1.6;
 utterance.rate = 1;
 utterance.volume = 100;
 

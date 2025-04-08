@@ -19,8 +19,8 @@
 }
 
 [data-theme="light"] {
-	--background-color: #f1e8e8;
-	--text-color: #332f2f;
+	--background-color: #f4f7f5;
+	--text-color: #0f0808;
 }
 [data-theme="dark"] {
 	--background-color: var(--third-bg-color);
@@ -53,7 +53,7 @@ body {
 
 h1{
     font-size: 4rem;
-    text-shadow: 0 0 50px var(--sec-main-color), 0 0 100px var(--sec-main-color);
+    text-shadow: 0 0 25px var(--sec-main-color), 0 0 50px var(--text-color), 0 0 100px var(--text-color);
 }
 
 .container{
@@ -73,7 +73,7 @@ h1{
     border-left: 1px solid #fff;
     border-right: 1px solid #ffffff6a;
     border-bottom: 1px solid #ffffff20;
-    box-shadow: 0 0 15px var(--sec-main-color);
+    box-shadow: 0 0 5px var(--sec-main-color), 0 0 18px var(--text-color);
     border-radius: 12px;
     transition: 0.4s ease;
 }
@@ -96,7 +96,7 @@ h1{
     cursor: pointer;
     margin: 100px 100px;
     transition: 0.4s ease;
-    box-shadow: 0 0 25px var(--sec-main-color), 0 0 50px var(--sec-main-color)
+    box-shadow: 0 0 15px var(--sec-main-color), 0 0 25px var(--text-color), 0 0 35px var(--text-color);
 }
 
 .item img:hover{
