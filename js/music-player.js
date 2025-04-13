@@ -95,71 +95,78 @@ let songs = [];
 
 // Function to get the media files
 const accessMediaButton = document.getElementById('allow-media-access');
+
 accessMediaButton.addEventListener('click', async () => {
-  try {
-    if ('showDirectoryPicker' in window) {
-      // Use the showDirectoryPicker API to access media files (for desktop devices)
-      const directoryHandle = await window.showDirectoryPicker();
-      const files = await getFilesFromDirectoryHandle(directoryHandle);
-      songs = files.filter((file) =>
-        file.name.endsWith('.mp3') ||
-        file.name.endsWith('.wav') ||
-        file.name.endsWith('.ogg')
-      );
-      displaySongList(songs);
-    } else {
-      // Use a file input element with the multiple attribute for mobile devices
-      const directoryInput = document.createElement('input');
-      directoryInput.type = 'file';
-      directoryInput.multiple = true;
-
-      directoryInput.addEventListener('change', async (event) => {
-        const files = event.target.files;
-        songs = Array.from(files).filter((file) =>
-          file.name.endsWith('.mp3') ||
-          file.name.endsWith('.wav') ||
-          file.name.endsWith('.ogg')
-        );
-        displaySongList(songs);
-      });
-
-      directoryInput.click();
-    }
-  } catch (error) {
-    console.error('Error getting media files:', error);
-  }
-});
+	try {
+	  if ('showDirectoryPicker' in window) {
+		// Use the showDirectoryPicker API to access media files (for desktop devices)
+		const directoryHandle = await window.showDirectoryPicker();
+		const files = await getFilesFromDirectoryHandle(directoryHandle);
+  
+		songs = files.filter((file) =>
+		  file.name.endsWith('.mp3') ||
+		  file.name.endsWith('.wav') ||
+		  file.name.endsWith('.ogg')
+		);
+  
+		displaySongList(songs);
+	  } else {
+		// Use a file input element with the webkitdirectory attribute for mobile devices
+		const directoryInput = document.createElement('input');
+		directoryInput.type = 'file';
+		directoryInput.webkitdirectory = true;
+		directoryInput.directory = true;
+		directoryInput.multiple = true;
+  
+		directoryInput.addEventListener('change', async (event) => {
+		  const files = event.target.files;
+		  const songs = Array.from(files).filter((file) =>
+			file.name.endsWith('.mp3') ||
+			file.name.endsWith('.wav') ||
+			file.name.endsWith('.ogg')
+		  );
+		  displaySongList(songs);
+		});
+  
+		directoryInput.click();
+	  }
+	} catch (error) {
+	  console.error('Error getting media files:', error);
+	}
+  });
+  
 
 async function getFilesFromDirectoryHandle(directoryHandle) {
-  const files = [];
-  for await (const entry of directoryHandle.values()) {
-    if (entry.kind === 'file') {
-      files.push({ name: entry.name, file: await entry.getFile() });
-    } else if (entry.kind === 'directory') {
-      const subFiles = await getFilesFromDirectoryHandle(await entry.getDirectoryHandle());
-      files.push(...subFiles);
-    }
+	const files = [];
+	for await (const entry of directoryHandle.values()) {
+	  if (entry.kind === 'file') {
+		files.push({ name: entry.name, file: await entry.getFile() });
+	  } else if (entry.kind === 'directory') {
+		const subFiles = await getFilesFromDirectoryHandle(await entry.getDirectoryHandle());
+		files.push(...subFiles);
+	  }
+	}
+	return files;
   }
-  return files;
-}
+
 
 // Function to display the song list
-function displaySongList(songs) {
-  songList.innerHTML = "";
-  songs.forEach((song, index) => {
-    const songElement = document.createElement("li");
-    songElement.textContent = song.name;
-    songElement.addEventListener("click", () => {
-      currentSongIndex = index;
-      playCurrentSong(currentSongIndex);
-    });
-    songList.appendChild(songElement);
-  });
-  musicPlayerSection.style.display = "none";
-  landingSection.style.display = "none";
-  songListSection.style.display = "block";
-  bottomPlayerSection.style.display = "block";
-  searchContainer.style.display = "none";
+function displaySongList() {
+	songList.innerHTML = "";
+	songs.forEach((song, index) => {
+		const songElement = document.createElement("li");
+		songElement.textContent = song.name;
+		songElement.addEventListener("click", () => {
+			currentSongIndex = index;
+			playCurrentSong(currentSongIndex);
+		});
+		songList.appendChild(songElement);
+	});
+	musicPlayerSection.style.display = "none";
+	landingSection.style.display = "none";
+	songListSection.style.display = "block";
+	bottomPlayerSection.style.display = "block";
+	searchContainer.style.display = "none";
 }
 
 // Get the song image element
@@ -274,6 +281,7 @@ function playCurrentSong(songIndex) {
 	bottomPlayerSection.style.display = "none";
 	nowPlayingSection.style.display = "none";
 	playlistsSection.style.display = "none";
+	searchContainer.style.display = "none";
 }
 
 // Add event listener to the audio player's "ended" event
