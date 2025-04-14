@@ -133,9 +133,11 @@ document.querySelector(".theme-btn").addEventListener('click', () => {
 	  newTheme = 'dim';
 	} else if (currentTheme === 'dim') {
 	  newTheme = 'dark';
+	} else if (currentTheme === 'dark') {
+	  newTheme = 'blue';
 	} else {
-	  newTheme = 'light';
-	}
+    newTheme = 'light';
+  }
   
 	document.documentElement.setAttribute('data-theme', newTheme);
 	localStorage.setItem('theme', newTheme); // Save preference

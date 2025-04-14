@@ -107,4 +107,10 @@ button:hover {
 		max-width: 80px;
 		background: #e4dcdc6e;
 	}
+
+	.enter-btn{
+		max-width: 135px;
+		padding: 8px;
+		font-size: 36px;
+	}
 }

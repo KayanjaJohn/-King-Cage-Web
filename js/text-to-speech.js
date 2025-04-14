@@ -114,3 +114,4 @@ textArea.addEventListener("input", (e) => {
 
 	textArea.value = text;
 });
+

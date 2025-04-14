@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Text to Speech landing page</title>
+		<title>Text to Speech</title>
 		<link rel="shortcut icon" href="/img/King_Cage.jpg" type="image/x-icon">
         <link
 			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
@@ -11,21 +11,16 @@
 		<link rel="stylesheet" href="/css/text-to-speech.css" />
 	</head>
 	<style>
-
 		body{
 			text-align: center;
 			font-size:24px ;
-		}
-
-		button{
-			margin-top: 120px;
 		}
 
 		h1{
 			font-size: 62px;
 		}
 
-		p, h4{
+		h4{
 			padding: 6px;
 			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 		}
@@ -33,20 +28,24 @@
 		span{
 			font-size: 55px;
 		}
-
 	</style>
-
 	<body>
 		<h1>Text to speech</h1>
+		<h4>Paste your text into the provided area below</h4>
 		<span>👇</span>
-		<h4>Are you tired of wasting your energy reading long text or stories!</h4>
-		<p>Copy the text you want to read and tap the enter button to ease your life.</p>
-		<p>You just have to paste the text into the provided area and then you're free to use the play and stop buttons available.</p>
-		<p><b>You're welcome😁</b></p>
-		<span>👇</span><br>
+		<div class="container">
+			<div class="spofity-row" style="display: none;">
+            <canvas id="visualizer"></canvas>
+        </div>
+			<textarea
+				id="text"
+				placeholder="Enter text here..."></textarea>
+			<div class="btn">
+                <button id="speak"><i class="bx bx-play"></i></button>
+                <button id="stop"><i class="bx bx-stop"></i></button>
+            </div>
+		</div>
 
-		<button class="enter-btn">Enter</button>
-
-		<script src="/js/text-to-speech0.js"></script>
+		<script src="/js/text-to-speech.js"></script>
 	</body>
 </html>
