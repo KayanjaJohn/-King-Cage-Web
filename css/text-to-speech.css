@@ -115,3 +115,9 @@ button:hover {
 		margin-top:80px ;
 	}
 }
+
+@media (max-height:740px) {
+	.enter-btn{
+		margin-bottom:20px ;
+	}
+}
