@@ -22,8 +22,8 @@ const femaleVoice = voices.filter(
 // Set the text and voice for the utterance
 utterance.text = textArea.value;
 utterance.voice = femaleVoice || voices[0];
-utterance.pitch = 1.6;
-utterance.rate = 1;
+utterance.pitch = 1;
+utterance.rate = 0.9;
 utterance.volume = 100;
 
 // Add event listeners to the buttons
