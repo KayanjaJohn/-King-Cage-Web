@@ -10,29 +10,12 @@
 			rel="stylesheet" />
 		<link rel="stylesheet" href="/css/text-to-speech.css" />
 	</head>
-	<style>
-		body{
-			text-align: center;
-			font-size:24px ;
-		}
-
-		h1{
-			font-size: 62px;
-		}
-
-		h4{
-			padding: 6px;
-			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-		}
-
-		span{
-			font-size: 55px;
-		}
-	</style>
 	<body>
-		<h1>Text to speech</h1>
-		<h4>Paste your text into the provided area below</h4>
-		<span>👇</span>
+		<!-- <h1>Text to speech</h1> -->
+		 <br>
+		<h3>Paste your text into the provided area below</h3>
+		<h4>Select the the kind of accent and voice you want to hear, and then use the buttons to output your audio.</h4>
+		<span>👇</span>		
 		<div class="container">
 			<div class="spofity-row" style="display: none;">
             <canvas id="visualizer"></canvas>
@@ -40,6 +23,19 @@
 			<textarea
 				id="text"
 				placeholder="Enter text here..."></textarea>
+				<div class="selectors">
+					<label class="languageSelect">Accent:
+						<select id="languageSelect"></select>
+					</label>
+					<label class="voiceSelect">Voice:
+						<select id="voiceSelect"></select>
+					</label>
+				</div>
+				<div class="controls">
+					<label>Speed: <input type="range" id="rate" min="0.5" max="2" step="0.05" value="0.95"></label>
+					<label>Pitch: <input type="range" id="pitch" min="0" max="2" step="0.05" value="1.05"></label>
+					<label>Volume: <input type="range" id="volume" min="0" max="1" step="0.1" value="1"></label>
+				</div>
 			<div class="btn">
                 <button id="speak"><i class="bx bx-play"></i></button>
                 <button id="stop"><i class="bx bx-stop"></i></button>

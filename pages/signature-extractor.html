@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signature Extractor</title>
+  <link rel="shortcut icon" href="/img/King_Cage.jpg" type="image/x-icon">
+  <link rel="stylesheet" href="/css/signature-extractor.css">
+</head>
+<body>
+  <div class="container">
+    <h1><span class="extract-span">⚒️</span><span class="extract-span">tract</span> <i>signatures</i> from <span>Images📸</span></h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <canvas id="dummy-canvas" width="600" height="100"></canvas>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <br>
+    <button onclick="download()">Download as Image</button>
+    <button onclick="downloadText()">Download as Text</button>
+  </div>
+  <script src="/js/signature-extractor.js"></script>
+</body>
+</html>

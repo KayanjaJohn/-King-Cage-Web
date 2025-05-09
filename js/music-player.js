@@ -106,7 +106,8 @@ accessMediaButton.addEventListener('click', async () => {
 		songs = files.filter((file) =>
 		  file.name.endsWith('.mp3') ||
 		  file.name.endsWith('.wav') ||
-		  file.name.endsWith('.ogg')
+		  file.name.endsWith('.ogg') ||
+		  file.name.endsWith('.m4a')
 		);
   
 		displaySongList(songs);
@@ -178,7 +179,6 @@ function getSongImage(songFile) {
 
 	jsmediatags.read(songFile, {
 		onSuccess: function (tag) {
-
 			if (!songImageElement) {
 				console.error("Error: songImageElement not found in the DOM.");
 				return;
@@ -205,67 +205,142 @@ function getSongImage(songFile) {
 		onError: function (error) {
 			console.error("Error reading song image:", error);
 			if (songImageElement) {
-				songImageElement.src = "/img/img0.jpg"; // Set default image on error
+				songImageElement.src = "/img/img0.jpg";
 			}
 		},
 	});
 }
 
-// Function to edit the album image
+document.getElementById("edit-album-image-button").addEventListener("click", () => {
+	document.getElementById("album-image-input").click();
+  });
+
+document.getElementById("album-image-input").addEventListener("change", updateAlbumImage);
+
+
+// Trigger image input
 function editAlbumImage() {
-	const fileInput = document.getElementById("album-image-input");
-	fileInput.click();
+	document.getElementById("album-image-input").click();
 }
 
-// Function to update the album image
+// Handle selected image
 function updateAlbumImage(event) {
-	const file = event.target.files[0];
-	const imageObjectUrl = URL.createObjectURL(file);
-	songImageElement.src = imageObjectUrl;
-	// Update the song file with the new album image
-	updateSongFileAlbumImage(file);
-}
+	const imageFile = event.target.files[0];
+	if (!imageFile) return;
+	songImageElement.src = URL.createObjectURL(imageFile);
+	updateSongFileAlbumImage(imageFile);
+  }
 
-// Function to update the song file with the new album image
-function updateSongFileAlbumImage(file) {
-	// Use a library like jsmediatags to update the album image
-	const jsmediatags = window.jsmediatags;
-	jsmediatags.write(
-		songs[currentSongIndex].file,
-		{
-			tags: {
-				picture: file,
-			},
-		},
-		{
-			onSuccess: function () {
-				console.log("Album image updated successfully");
-			},
-			onError: function (error) {
-				console.error("Error updating album image:", error);
-			},
+  function updateSongFileAlbumImage(imageFile) {
+	const songFile = songs[currentSongIndex].file;
+	if (!songFile) {
+	  alert("No MP3 file loaded.");
+	  return;
+	}
+
+	const reader = new FileReader();
+	reader.onload = function () {
+	  const arrayBuffer = reader.result;
+
+	  const imageReader = new FileReader();
+	  imageReader.onload = function () {
+		const imageBuffer = imageReader.result;
+
+		try {
+		  const writer = new window.ID3Writer(arrayBuffer); // ✅ Use window.ID3Writer
+		  writer
+			.setFrame("TIT2", "My Title")
+			.setFrame("TPE1", ["My Artist"])
+			.setFrame("APIC", {
+			  type: 3,
+			  data: new Uint8Array(imageBuffer),
+			  description: "Cover",
+			  mime: imageFile.type,
+			})
+			.addTag();
+
+		  const taggedBlob = writer.getBlob();
+		  const downloadLink = document.createElement("a");
+		  downloadLink.href = URL.createObjectURL(taggedBlob);
+		  downloadLink.download = "updated-song.mp3";
+		  downloadLink.click();
+
+		  alert("Updated!\nTitle: My Title\nArtist: My Artist");
+		} catch (e) {
+		  console.error("ID3Writer failed:", e);
+		  alert("Error: Failed to update tags.");
 		}
-	);
+	  };
+
+	  imageReader.readAsArrayBuffer(imageFile);
+	};
+
+	reader.readAsArrayBuffer(songFile);
+  }
+
+////////////////////////////////////////////////////////////////
+const speedControl = document.getElementById("speedControl");
+const volumeControl = document.getElementById("volumeControl");
+const speedValue = document.getElementById("speedValue");
+const volumeValue = document.getElementById("volumeValue");
+
+// Update label functions
+function updateSpeedLabel() {
+	speedValue.textContent = parseFloat(speedControl.value).toFixed(1);
 }
 
-// Add event listeners
-document
-	.getElementById("edit-album-image-button")
-	.addEventListener("click", editAlbumImage);
-document
-	.getElementById("album-image-input")
-	.addEventListener("change", updateAlbumImage);
+function updateVolumeLabel() {
+	volumeValue.textContent = Math.round(parseFloat(volumeControl.value) * 100);
+}
 
-// Function to play the current song
+// Listen for slider changes
+speedControl.addEventListener("input", () => {
+	audioPlayer.playbackRate = parseFloat(speedControl.value);
+	localStorage.setItem("playerSpeed", speedControl.value);
+	updateSpeedLabel();
+});
+
+volumeControl.addEventListener("input", () => {
+	audioPlayer.volume = parseFloat(volumeControl.value);
+	localStorage.setItem("playerVolume", volumeControl.value);
+	updateVolumeLabel();
+});
+
+// Load saved settings and update labels
+window.addEventListener("DOMContentLoaded", () => {
+	const savedSpeed = localStorage.getItem("playerSpeed");
+	const savedVolume = localStorage.getItem("playerVolume");
+
+	if (savedSpeed) {
+		speedControl.value = savedSpeed;
+		audioPlayer.playbackRate = parseFloat(savedSpeed);
+	}
+	if (savedVolume) {
+		volumeControl.value = savedVolume;
+		audioPlayer.volume = parseFloat(savedVolume);
+	}
+
+	// Make sure labels reflect loaded or default values
+	updateSpeedLabel();
+	updateVolumeLabel();
+});
+
+// The currently playing song function
 function playCurrentSong(songIndex) {
 	currentSongIndex = songIndex;
 	audioPlayer.src = URL.createObjectURL(songs[currentSongIndex].file);
+
+	audioPlayer.playbackRate = parseFloat(speedControl.value); // ✅ apply speed
+	audioPlayer.volume = parseFloat(volumeControl.value); // ✅ apply volume
+
 	// Remove selected-song class from all song items
 	for (let i = 0; i < songList.children.length; i++) {
 		songList.children[i].classList.remove("selected-song");
 	}
+
 	// Add selected-song class to the currently playing song list
 	songList.children[currentSongIndex].classList.add("selected-song");
+
 	audioPlayer.play();
 	initializeVisualizer();
 	playPauseBtn.innerHTML = '<i class="bx bx-pause"></i>';
@@ -273,9 +348,11 @@ function playCurrentSong(songIndex) {
 	updateSongInfo();
 	renderNowPlayingPlaylist();
 	bottomPlayerUpdateSongInfo();
+
 	setTimeout(() => {
 		getSongImage(songs[currentSongIndex].file);
 	}, 100);
+
 	musicPlayerSection.style.display = "block";
 	songListSection.style.display = "none";
 	bottomPlayerSection.style.display = "none";
@@ -283,6 +360,8 @@ function playCurrentSong(songIndex) {
 	playlistsSection.style.display = "none";
 	searchContainer.style.display = "none";
 }
+
+
 
 // Add event listener to the audio player's "ended" event
 audioPlayer.addEventListener("ended", () => {
