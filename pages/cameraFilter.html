@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Filter App</title>
+  <link rel="stylesheet" href="/css/cameraFilter.css">
+</head>
+<body>
+  <div class="container">
+      <canvas id="canvas" width="640" height="480"></canvas>
+      <video id="video" width="640" height="480"></video>
+    <div class="controls">
+      <button id="start-button">Start Camera</button>
+      <button id="filter-button">Apply Filter</button>
+      <select id="filter-select">
+        <option value="none">None</option>
+        <option value="grayscale">Grayscale</option>
+        <option value="sepia">Sepia</option>
+        <option value="invert">Invert</option>
+        <option value="auto-color">Auto Color</option>
+      </select>
+    </div>
+  </div>
+
+  <script src="/js/cameraFilter.js"></script>
+</body>
+</html>

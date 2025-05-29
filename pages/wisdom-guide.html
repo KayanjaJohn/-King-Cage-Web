@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wisdom Guide</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --text: #f1f1f1;
+      --card: #1e1e1e;
+      --accent: #9acd32;
+      --btn-green: #4caf50;
+      --btn-red: #f44336;
+    }
+    body.light {
+      --bg: #ffffff;
+      --text: #111;
+      --card: #f3f3f3;
+    }
+    body.calm {
+      --bg: #e7f6f2;
+      --text: #264653;
+      --card: #f0fdfa;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
+      display: flex;
+      flex-grow: 1;
+    }
+    aside {
+      width: 250px;
+      background: var(--card);
+      padding: 1rem;
+      border-right: 1px solid #333;
+      overflow-y: auto;
+    }
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+    }
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background: var(--card);
+      color: var(--text);
+    }
+    .card {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin: 1rem 0;
+    }
+    .favorite-btn, .stop-btn {
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .favorite-btn { background-color: var(--btn-green); color: white; }
+    .stop-btn { background-color: var(--btn-red); color: white; }
+    .nav-link {
+      display: block;
+      margin: 0.5rem 0;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-link:hover { text-decoration: underline; }
+    #quoteOfDay {
+      background: var(--accent);
+      color: #000;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      aside { width: 100%; order: 2; border-right: none; border-top: 1px solid #333; }
+      main { order: 1; }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgMusic" src="https://cdn.pixabay.com/audio/2022/03/15/audio_7507c2ba58.mp3" loop autoplay></audio>
+  <audio id="clickSound" src="https://cdn.pixabay.com/audio/2022/03/10/audio_59e8a79fba.mp3"></audio>
+  <audio id="calmSound" src="https://cdn.pixabay.com/audio/2022/03/16/audio_13986b6da5.mp3" loop></audio>
+
+  <div class="container">
+    <aside>
+      <h3>Favorites</h3>
+      <div id="favoritesList"></div>
+      <hr>
+      <a href="#" class="nav-link" onclick="goToSettings()">⚙️ Settings</a>
+      <button onclick="exportFavorites()">📤 Export Favorites</button>
+    </aside>
+    <main>
+      <h1>🧠 Wisdom Guide</h1>
+      <div id="quoteOfDay"></div>
+      <label for="themeSelect">Choose a theme:</label>
+      <select id="themeSelect"></select>
+      <button onclick="getRandomWisdom()">🔀 Random Wisdom</button>
+      <div id="output" class="card"></div>
+      <div id="settingsPanel" style="display:none;" class="card">
+        <h3>Settings</h3>
+        <label for="voiceSelect">Select Voice:</label>
+        <select id="voiceSelect"></select><br>
+        <button onclick="toggleTheme()">Toggle Theme</button>
+        <button onclick="toggleMusic()">Toggle Music</button>
+        <button onclick="clearFavorites()">Clear Favorites</button>
+        <button onclick="toggleCalmMode()">Toggle Calming Mode</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const themes = {
+  integrity: {
+    verse: "The integrity of the upright guides them, but the unfaithful are destroyed by their duplicity. — Proverbs 11:3",
+    example: `Malik worked as a night cleaner in a corporate office. One evening, he found a wallet stuffed with cash behind a desk. No cameras, no witnesses. He paused, tempted, but picked it up and turned it in to security. Days later, the wallet's owner—a senior executive—personally thanked him. Months later, that same executive offered Malik a new position in the company’s logistics department. What he did in the dark brought him into the light.`,
+    lesson: "Integrity builds trust and opens doors—even when no one is watching.",
+    solutions: [
+      "Be honest in small things as well as big.",
+      "Keep promises and admit mistakes openly.",
+      "Act consistently with your values."
+    ]
+  },
+  friendships: {
+    verse: "Walk with the wise and become wise, for a companion of fools suffers harm. — Proverbs 13:20",
+    example: `Janelle was a brilliant high school student with dreams of becoming a doctor. But she started hanging out with a group that normalized cheating, drinking, and disrespect. Over time, her grades dropped, and she almost lost her scholarship. It wasn’t until a teacher intervened and introduced her to a group of focused students that she realigned her path. The people around her changed everything.`,
+    lesson: "Surround yourself with people who inspire and challenge you to grow.",
+    solutions: [
+      "Evaluate your current friendships honestly.",
+      "Seek out mentors and positive role models.",
+      "Limit time with influences that lead you astray."
+    ]
+  },
+  diligence: {
+    verse: "The plans of the diligent lead to profit as surely as haste leads to poverty. — Proverbs 21:5",
+    example: `Isaac wanted to get rich fast. He threw money into crypto schemes and trendy side hustles, but nothing stuck. His cousin Miko, meanwhile, quietly worked on a small candle business for two years—testing scents, branding, and customer service. Today, Miko owns a growing company with international orders. Isaac? He’s learned to embrace diligence over shortcuts.`,
+    lesson: "Steady effort and patience create lasting success.",
+    solutions: [
+      "Set clear, achievable goals.",
+      "Work consistently every day—even in small ways.",
+      "Avoid get-rich-quick schemes and focus on building skills."
+    ]
+  },
+  anger: {
+    verse: "A fool gives full vent to his anger, but a wise person quietly holds it back. — Proverbs 29:11",
+    example: `Tariq was a great mechanic, but his temper was legendary. One day, a client made a harsh comment about his work. Tariq exploded, yelled, and told the man never to come back. Turns out the client was a fleet manager scouting garages for a maintenance contract. He went elsewhere. Tariq later said that moment cost him more than a paycheck—it cost him his reputation.`,
+    lesson: "Controlling anger protects relationships and reputation.",
+    solutions: [
+      "Pause and take deep breaths before reacting.",
+      "Express frustrations calmly and constructively.",
+      "Practice empathy by seeing things from others' perspectives."
+    ]
+  },
+  listening: {
+    verse: "To answer before listening—that is folly and shame. — Proverbs 18:13",
+    example: `At a family gathering, Maria started criticizing her cousin’s parenting style before fully hearing her out. Her cousin left in tears. Only later did Maria learn that the cousin’s child had recently been diagnosed with a behavioral disorder. That moment taught Maria to slow down, listen deeply, and speak with understanding—not assumption.`,
+    lesson: "Listening fully shows respect and uncovers truth.",
+    solutions: [
+      "Focus on the speaker without interrupting.",
+      "Ask clarifying questions before responding.",
+      "Reflect on what you heard before giving advice."
+    ]
+  },
+  guardingHeart: {
+    verse: "Above all else, guard your heart, for everything you do flows from it. — Proverbs 4:23",
+    example: `David was always comparing himself to others on social media. He felt inadequate and bitter, even though his own life was quite stable. One day, he deactivated everything for a month and started journaling instead. His anxiety dropped, confidence rose, and he realized that guarding his heart meant filtering what he let in—and what he let define him.`,
+    lesson: "Protect your inner life to maintain peace and purpose.",
+    solutions: [
+      "Limit exposure to negative influences like harmful media.",
+      "Practice gratitude and focus on personal growth.",
+      "Surround yourself with uplifting, encouraging people."
+    ]
+  },
+  patience: {
+    verse: "A patient person has great understanding, but a quick-tempered one displays folly. — Proverbs 14:29",
+    example: `Zoe was learning photography and wanted instant success. But every time she didn’t get likes or sales, she felt defeated. A mentor told her, “Patience isn’t passive—it’s practice.” So she committed to taking one photo a day, rain or shine, for a year. At the end of that year, she had her first gallery show. Her patience became her power.`,
+    lesson: "Patience cultivates wisdom and long-term reward.",
+    solutions: [
+      "Set realistic expectations for progress.",
+      "Practice mindfulness to stay calm during delays.",
+      "Remember that growth takes time."
+    ]
+  },
+  humility: {
+    verse: "Pride goes before destruction, a haughty spirit before a fall. — Proverbs 16:18",
+    example: `Kamal was the top coder in his company and knew it. But when he refused help or feedback on a big software rollout, everything crashed on launch day. A junior dev had warned him about a bug—one he dismissed. After that, Kamal learned that real strength isn’t in being always right—it’s in being open to correction.`,
+    lesson: "Humility opens the door to learning and growth.",
+    solutions: [
+      "Accept constructive feedback gratefully.",
+      "Admit when you don’t know something.",
+      "Recognize the value in others' ideas and perspectives."
+    ]
+  },
+  planning: {
+    verse: "The prudent see danger and take refuge, but the simple keep going and pay the penalty. — Proverbs 27:12",
+    example: `Nina worked as a freelance designer. She had good months and lean ones, but she never saved. When the economy dipped and contracts dried up, she struggled. Meanwhile, her friend Elise had built a small emergency fund and diversified her clients. Elise offered support, but Nina’s lesson was clear: you don’t plan for disaster when it hits—you prepare before it does.`,
+    lesson: "Wise planning protects you from unforeseen challenges.",
+    solutions: [
+      "Build an emergency savings fund.",
+      "Diversify income streams or skills.",
+      "Anticipate risks and create contingency plans."
+    ]
+  },
+  speakingLife: {
+    verse: "The tongue has the power of life and death, and those who love it will eat its fruit. — Proverbs 18:21",
+    example: `Tom’s son failed a math test and looked crushed. Tom almost said, “You’re just not good at math.” Instead, he paused and said, “This test doesn’t define you—we’ll figure it out together.” That moment, simple as it was, became a turning point in their relationship. His words didn’t wound—they built.`,
+    lesson: "Words can heal or harm; choose them to uplift.",
+    solutions: [
+      "Think before you speak, especially in emotional moments.",
+      "Encourage and affirm others regularly.",
+      "Avoid gossip and harsh criticism."
+    ]
+  },
+  generosity: {
+    verse: "Whoever is generous to the poor lends to the Lord, and he will repay him for his deed. — Proverbs 19:17",
+    example: `Sara always felt she had too little to give, but when she started volunteering at a local shelter and donating small amounts, she noticed her own joy and gratitude growing. One day, a grateful family she helped paid it forward in an unexpected way, reminding Sara that generosity multiplies in ways money can’t measure.`,
+    lesson: "Generosity blesses both giver and receiver in unexpected ways.",
+    solutions: [
+      "Give what you can—time, money, or skills.",
+      "Volunteer regularly in your community.",
+      "Practice gratitude to cultivate a giving heart."
+    ]
+  },
+  resilience: {
+    verse: "Though the righteous fall seven times, they rise again. — Proverbs 24:16",
+    example: `After losing his job twice in one year, Jacob felt broken. But each time he got up, learned a new skill, and applied again. His persistence landed him a better role, and his story inspired his community. Resilience wasn’t just surviving—it was thriving after every fall.`,
+    lesson: "Resilience empowers you to bounce back stronger from setbacks.",
+    solutions: [
+      "View failures as opportunities to learn.",
+      "Build supportive relationships.",
+      "Develop healthy coping habits like exercise or prayer."
+    ]
+  },
+  gratitude: {
+    verse: "Give thanks in all circumstances; for this is God’s will for you. — 1 Thessalonians 5:18 (inspired)",
+    example: `Even on her worst days, Leila made a habit of writing three things she was thankful for. Over time, this practice shifted her perspective from scarcity to abundance, helping her face challenges with hope and a grateful heart.`,
+    lesson: "Gratitude transforms your outlook and opens joy.",
+    solutions: [
+      "Keep a daily gratitude journal.",
+      "Express thanks to others regularly.",
+      "Focus on what you have, not what you lack."
+    ]
+  },
+  wisdomOfSilence: {
+    verse: "Even a fool is thought wise if he keeps silent, and discerning if he holds his tongue. — Proverbs 17:28",
+    example: `Chris learned the hard way that speaking impulsively can hurt relationships. After practicing thoughtful silence and listening, his friendships deepened and conflicts diminished. Sometimes, wisdom begins with saying less.`,
+    lesson: "Knowing when to be silent is a mark of true wisdom.",
+    solutions: [
+      "Pause before speaking, especially when upset.",
+      "Listen more than you talk.",
+      "Avoid unnecessary arguments or gossip."
+    ]
+  },
+  hope: {
+    verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you. — Jeremiah 29:11",
+    example: `When faced with uncertainty, Naomi held onto hope and faith. Despite setbacks, she kept working toward her goals, inspiring others with her optimism and steady trust in a better tomorrow.`,
+    lesson: "Hope fuels perseverance and keeps you moving forward.",
+    solutions: [
+      "Set hopeful goals and envision success.",
+      "Surround yourself with encouraging people.",
+      "Keep faith alive through prayer or meditation."
+    ]
+  },
+  courage: {
+    verse: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go. — Joshua 1:9",
+    example: `Lina was terrified to start her own business in a male-dominated industry. Each day, fear whispered doubts, but she remembered a mentor’s advice: courage isn’t the absence of fear, but moving forward despite it. After many challenges, her small tech startup flourished, and she became a beacon for other women entrepreneurs.`,
+    lesson: "Courage is acting in spite of fear, not because it’s absent.",
+    solutions: [
+      "Face fears gradually through small challenges.",
+      "Seek support from mentors and friends.",
+      "Celebrate each step forward, no matter how small."
+    ]
+  },
+  forgiveness: {
+    verse: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you. — Ephesians 4:32",
+    example: `After a bitter falling out with her sister, Rachel held onto resentment for years. When their mother became ill, Rachel chose to forgive and reconcile. That forgiveness healed wounds deeper than words, bringing peace and renewed family bonds that neither time nor pain could break.`,
+    lesson: "Forgiveness frees you from the burden of bitterness.",
+    solutions: [
+      "Choose to forgive even if feelings are slow to follow.",
+      "Seek understanding of others’ perspectives.",
+      "Focus on healing rather than revenge."
+    ]
+  },
+  contentment: {
+    verse: "But godliness with contentment is great gain. — 1 Timothy 6:6",
+    example: `Mark always chased the next promotion, the bigger house, the newer car. Yet he was never satisfied. After a season of burnout, Mark embraced contentment—focusing on simple joys and gratitude. His happiness didn’t come from more, but from appreciating what he already had.`,
+    lesson: "Contentment brings peace beyond material success.",
+    solutions: [
+      "Practice gratitude daily.",
+      "Limit comparisons with others.",
+      "Enjoy simple pleasures intentionally."
+    ]
+  },
+  honesty: {
+    verse: "The Lord detests lying lips, but he delights in people who are trustworthy. — Proverbs 12:22",
+    example: `Nia accidentally broke a neighbor’s window while playing. Instead of hiding it, she confessed and offered to help fix it. Her honesty surprised her neighbor and built a lasting trust between their families—proving that truthfulness always wins respect.`,
+    lesson: "Honesty builds trust and respect in all relationships.",
+    solutions: [
+      "Speak truthfully, even when it’s hard.",
+      "Take responsibility for your actions.",
+      "Be consistent in your words and deeds."
+    ]
+  },
+  faith: {
+    verse: "Now faith is confidence in what we hope for and assurance about what we do not see. — Hebrews 11:1",
+    example: `Samuel was unemployed for months but kept praying and applying for jobs. When a sudden opportunity opened up that perfectly matched his skills, he knew it was answered faith. His perseverance taught him that unseen hope moves mountains.`,
+    lesson: "Faith sustains you through uncertainty and challenges.",
+    solutions: [
+      "Keep believing even when results are delayed.",
+      "Seek encouragement from faith communities.",
+      "Pair faith with action—keep trying."
+    ]
+  },
+  generosityOfSpirit: {
+    verse: "A generous person will prosper; whoever refreshes others will be refreshed. — Proverbs 11:25",
+    example: `Olivia volunteered at a homeless shelter regularly, giving not just food but time and compassion. One winter, when she was facing her own hardships, the community came around her. Generosity of spirit had created a cycle of blessing beyond what she imagined.`,
+    lesson: "Generosity of spirit creates lasting community and blessing.",
+    solutions: [
+      "Offer kindness without expecting anything in return.",
+      "Be patient and present with those in need.",
+      "Celebrate others’ successes genuinely."
+    ]
+  },
+  selfControl: {
+    verse: "Like a city whose walls are broken through is a person who lacks self-control. — Proverbs 25:28",
+    example: `David struggled with anger and impulsive decisions that hurt relationships and opportunities. Through counseling, prayer, and discipline, he learned to pause, reflect, and respond with patience. His life transformed as self-control rebuilt his walls of peace.`,
+    lesson: "Self-control protects your life from unnecessary damage.",
+    solutions: [
+      "Practice mindfulness and self-awareness.",
+      "Develop routines that reduce temptation.",
+      "Use accountability partners or mentors."
+    ]
+  },
+  kindness: {
+    verse: "Be kind and compassionate to one another, forgiving each other. — Ephesians 4:32",
+    example: `When a new student joined Mia’s class, she noticed he was shy and lonely. She invited him to lunch, introduced him to friends, and checked in regularly. That small kindness changed the boy’s school experience and taught Mia the power of simple gestures.`,
+    lesson: "Kindness creates connection and eases others’ burdens.",
+    solutions: [
+      "Look for small ways to help daily.",
+      "Practice empathy by imagining others’ feelings.",
+      "Be consistent in your caring gestures."
+    ]
+  },
+  perseverance: {
+    verse: "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up. — Galatians 6:9",
+    example: `Carlos trained for a marathon despite recurring injuries. Each setback tested his will, but he kept pushing. Crossing the finish line, he realized perseverance wasn’t just about running; it was a mindset for every challenge in life.`,
+    lesson: "Perseverance turns obstacles into achievements.",
+    solutions: [
+      "Break big goals into manageable steps.",
+      "Celebrate progress, not just results.",
+      "Keep your motivation rooted in purpose."
+    ]
+  },
+  wisdomInDecisionMaking: {
+    verse: "If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault. — James 1:5",
+    example: `Jenna faced a tough career choice between a stable job and a risky startup. She prayed, sought counsel, and weighed options carefully. Her decision to trust God’s guidance led to unexpected growth and success. Wisdom isn’t instant—it’s cultivated through patience and faith.`,
+    lesson: "Wise decisions come from reflection, counsel, and faith.",
+    solutions: [
+      "Take time to pray or meditate before big choices.",
+      "Seek advice from trusted mentors or friends.",
+      "Consider long-term consequences, not just immediate gains."
+    ]
+  }
+};
+
+
+    const themeSelect = document.getElementById("themeSelect");
+    const outputDiv = document.getElementById("output");
+    const favoritesList = document.getElementById("favoritesList");
+    const voiceSelect = document.getElementById("voiceSelect");
+    const quoteOfDay = document.getElementById("quoteOfDay");
+    const bgMusic = document.getElementById("bgMusic");
+    const calmSound = document.getElementById("calmSound");
+    const clickSound = document.getElementById("clickSound");
+
+    Object.keys(themes).forEach(key => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      themeSelect.appendChild(option);
+    });
+
+    themeSelect.addEventListener("change", function () {
+      displayWisdom(this.value);
+    });
+
+    function displayWisdom(key) {
+      playClick();
+      const { verse, example, lesson, solutions } = themes[key];
+      outputDiv.innerHTML = `
+        <h2>${key.charAt(0).toUpperCase() + key.slice(1)}</h2>
+        <p><strong>Wisdom:</strong> "${verse}"</p>
+        <p><strong>Real-life Example:</strong> ${example}</p>
+        <p><strong>Lesson:</strong> "${lesson}"</p>
+        <p><strong>Solutions:</strong> ${solutions}</p>
+        <button class="favorite-btn" onclick="saveFavorite('${key}')">Save to Favorites</button>
+        <button class="stop-btn" onclick="stopSpeech()">Stop Speech</button>
+      `;
+      speakText(`${verse}. For example, ${example}`);
+    }
+
+    function getRandomWisdom() {
+      const keys = Object.keys(themes);
+      const randomKey = keys[Math.floor(Math.random() * keys.length)];
+      displayWisdom(randomKey);
+    }
+
+    function speakText(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.rate = document.body.classList.contains("calm") ? 0.8 : 1;
+      msg.voice = speechSynthesis.getVoices().find(v => v.name === voiceSelect.value);
+      msg.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(msg);
+    }
+
+    function stopSpeech() {
+      speechSynthesis.cancel();
+    }
+
+    function saveFavorite(key) {
+      playClick();
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      if (!favorites.includes(key)) {
+        favorites.push(key);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        displayFavorites();
+      }
+    }
+
+    function displayFavorites() {
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      favoritesList.innerHTML = favorites.length ? favorites.map(k => `
+        <div class="card">
+          <h4>${k.charAt(0).toUpperCase() + k.slice(1)}</h4>
+          <p><strong>Wisdom:</strong> "${themes[k].verse}"</p>
+        </div>`).join('') : '<p>No favorites saved yet.</p>';
+    }
+
+    function exportFavorites() {
+      const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      let content = favorites.map(k => `${k.toUpperCase()}\nWisdom: ${themes[k].verse}\nExample: ${themes[k].example}\n`).join("\n");
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "favorites.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function goToSettings() {
+      document.getElementById("settingsPanel").style.display = 'block';
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
+
+    function toggleMusic() {
+      bgMusic.paused ? bgMusic.play() : bgMusic.pause();
+    }
+
+    function toggleCalmMode() {
+      document.body.classList.toggle("calm");
+      document.body.classList.contains("calm") ? calmSound.play() : calmSound.pause();
+    }
+
+    function playClick() {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
+
+    function clearFavorites() {
+      playClick();
+      localStorage.removeItem("favorites");
+      displayFavorites();
+    }
+
+    function populateVoices() {
+      const voices = speechSynthesis.getVoices();
+      voiceSelect.innerHTML = voices.map(v => `<option>${v.name}</option>`).join('');
+    }
+
+    function showQuoteOfTheDay() {
+      const keys = Object.keys(themes);
+      const todayIndex = new Date().getDate() % keys.length;
+      const selected = keys[todayIndex];
+      const { verse } = themes[selected];
+      quoteOfDay.textContent = `📜 Quote of the Day: "${verse}"`;
+    }
+
+    function enableCalmModeAtNight() {
+      const hour = new Date().getHours();
+      if (hour >= 21 || hour <= 6) {
+        document.body.classList.add("calm");
+        calmSound.play();
+      }
+    }
+
+    speechSynthesis.onvoiceschanged = populateVoices;
+    window.onload = () => {
+      populateVoices();
+      displayFavorites();
+      showQuoteOfTheDay();
+      enableCalmModeAtNight();
+    };
+  </script>
+</body>
+</html>

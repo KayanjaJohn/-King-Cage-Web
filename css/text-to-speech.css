@@ -205,7 +205,7 @@ button:hover {
 	}
 	.enter-btn{
 		max-width: 135px;
-		padding: 8px;
+		height: 52px;
 		font-size: 36px;
 		margin-top:80px ;
 	}
